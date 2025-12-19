@@ -44,12 +44,12 @@ export default function DemoOne() {
               Built with deterministic control at its core, enabling you to govern what matters while automation handles the rest with speed and accuracy.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 items-center ">
-              <a href="/login" className="cursor-pointer">
+              <a href="/signup" className="cursor-pointer">
               <Button className="text-sm px-8 py-3 rounded-xl bg-white text-black border border-white/10 shadow-none hover:bg-white/90 transition-none min-w-36">
                 Get Started
               </Button>
               </a>
-              <a href="/signup" className="cursor-pointer">
+              <a href="/login" className="cursor-pointer">
               <Button className="text-sm px-8 py-3 rounded-xl bg-transparent text-white border border-white/20 shadow-none hover:bg-white/10 transition-none min-w-36">
                 Login
               </Button>
