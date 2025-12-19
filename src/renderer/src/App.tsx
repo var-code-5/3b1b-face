@@ -1,16 +1,31 @@
-import Versions from './components/Versions'
-import electronLogo from './assets/electron.svg'
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { AuthProvider } from './components/AuthContext';
+import Landing from './components/Landing';
+import Login from './components/Login';
+import Signup from './components/Signup';
+import Dashboard from './components/Dashboard';
+import ProtectedRoute from './components/ProtectedRoute';
 
 function App(): React.JSX.Element {
-  const ipcHandle = (): void => window.electron.ipcRenderer.send('ping')
-
   return (
-    <>
-      <h1>landing page</h1>
-      <button className=''>Login</button>
-      <button>signup</button>
-    </>
-  )
+    <AuthProvider>
+      <Router>
+        <Routes>
+          <Route path="/" element={<Landing />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/signup" element={<Signup />} />
+          <Route
+            path="/dashboard"
+            element={
+              <ProtectedRoute>
+                <Dashboard />
+              </ProtectedRoute>
+            }
+          />
+        </Routes>
+      </Router>
+    </AuthProvider>
+  );
 }
 
-export default App
+export default App;
