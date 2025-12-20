@@ -1,4 +1,4 @@
-import { app, shell, BrowserWindow, ipcMain } from 'electron'
+import { app, shell, BrowserWindow, ipcMain, session } from 'electron'
 import { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
@@ -13,9 +13,50 @@ function createWindow(): void {
     ...(process.platform === 'linux' ? { icon } : {}),
     webPreferences: {
       preload: join(__dirname, '../preload/index.js'),
-      sandbox: false
+      sandbox: false,
+      nodeIntegration: false,
+      contextIsolation: true,
+      webSecurity: false // Disable web security to allow CORS
     }
   })
+
+  // Handle media permissions (microphone, camera)
+  session.defaultSession.setPermissionRequestHandler((_webContents, permission, callback) => {
+    const allowedPermissions = ['media', 'microphone', 'audioCapture']
+    if (allowedPermissions.includes(permission)) {
+      callback(true) // Approve the permissions request
+    } else {
+      callback(false)
+    }
+  })
+
+  // Handle permission checks
+  session.defaultSession.setPermissionCheckHandler((_webContents, permission) => {
+    const allowedPermissions = ['media', 'microphone', 'audioCapture']
+    return allowedPermissions.includes(permission)
+  })
+
+  // Bypass CSP for fetch requests
+  session.defaultSession.webRequest.onHeadersReceived((details, callback) => {
+    callback({
+      responseHeaders: {
+        ...details.responseHeaders,
+        'Content-Security-Policy': [
+          "default-src * 'unsafe-inline' 'unsafe-eval' data: blob:; " +
+          "script-src * 'unsafe-inline' 'unsafe-eval'; " +
+          "connect-src * 'unsafe-inline' data: blob: https://9lw52178ayis33-8000.proxy.runpod.net; " +
+          "img-src * data: blob: 'unsafe-inline'; " +
+          "frame-src *; " +
+          "style-src * 'unsafe-inline';"
+        ]
+      }
+    })
+  })
+
+  // Open DevTools in development
+  if (is.dev) {
+    mainWindow.webContents.openDevTools()
+  }
 
   mainWindow.on('ready-to-show', () => {
     mainWindow.show()

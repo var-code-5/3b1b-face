@@ -54,6 +54,7 @@ const Login: React.FC = () => {
                     required
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
+                    className='text-black'
                   />
                 </Field>
                 <Field>
@@ -72,6 +73,7 @@ const Login: React.FC = () => {
                     required 
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
+                    className='text-black'
                   />
                 </Field>
                 {error && <p className="text-red-500 text-sm">{error}</p>}

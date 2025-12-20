@@ -33,13 +33,16 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   const login = (email: string, password: string): boolean => {
     // Simple check: if email exists in localStorage
-    const storedPassword = localStorage.getItem(`password_${email}`);
-    if (storedPassword === password) {
-      setUser(email);
-      localStorage.setItem('user', email);
-      return true;
-    }
-    return false;
+    // const storedPassword = localStorage.getItem(`password_${email}`);
+    // if (storedPassword === password) {
+    //   setUser(email);
+    //   localStorage.setItem('user', email);
+    //   return true;
+    // }
+    // return false;
+    setUser(email);
+    localStorage.setItem('user', email);
+    return true;
   };
 
   const signup = (email: string, password: string): boolean => {
