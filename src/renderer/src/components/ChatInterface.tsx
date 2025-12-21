@@ -1,20 +1,22 @@
 import React, { useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { Message } from './VoiceDashboard';
-import { Mic, MicOff, User, Bot } from 'lucide-react';
+import { Mic, MicOff, User, Bot, CheckCircle, XCircle } from 'lucide-react';
 
 interface ChatInterfaceProps {
   messages: Message[];
   isListening: boolean;
   transcript: string;
   onToggleListening: () => void;
+  verificationStatus?: 'idle' | 'verifying' | 'success' | 'failed';
 }
 
 const ChatInterface: React.FC<ChatInterfaceProps> = ({
   messages,
   isListening,
   transcript,
-  onToggleListening
+  onToggleListening,
+  verificationStatus
 }) => {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const messagesContainerRef = useRef<HTMLDivElement>(null);
@@ -60,23 +62,45 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
             )}
 
             {/* Message Bubble */}
-            <div
-              className={`max-w-2xl ${
-                message.isUser
+            <div className="relative">
+              <div
+                className={`max-w-2xl ${message.isUser
                   ? 'bg-gradient-to-br from-green-500 to-blue-500 text-white'
                   : 'bg-slate-800/50 backdrop-blur-md border border-slate-700/50 text-gray-200'
-              } rounded-2xl px-5 py-3 shadow-lg`}
-            >
-              <p className="text-base leading-relaxed whitespace-pre-wrap break-words">
-                {message.text}
-              </p>
-              <p
-                className={`text-xs mt-2 ${
-                  message.isUser ? 'text-green-100' : 'text-gray-400'
-                }`}
+                  } rounded-2xl px-5 py-3 shadow-lg`}
               >
-                {formatTime(message.timestamp)}
-              </p>
+                <p className="text-base leading-relaxed whitespace-pre-wrap break-words">
+                  {message.text}
+                </p>
+                <p
+                  className={`text-xs mt-2 ${message.isUser ? 'text-green-100' : 'text-gray-400'
+                    }`}
+                >
+                  {formatTime(message.timestamp)}
+                </p>
+              </div>
+
+              {/* Verified Tickmark */}
+              {message.isUser && message.verified === true && (
+                <motion.div
+                  initial={{ scale: 0, opacity: 0 }}
+                  animate={{ scale: 1, opacity: 1 }}
+                  className="absolute -bottom-2 -right-2 bg-white rounded-full p-0.5 shadow-md"
+                >
+                  <CheckCircle className="w-4 h-4 text-green-500 fill-green-100" />
+                </motion.div>
+              )}
+
+              {/* Failed Verification Cross */}
+              {message.isUser && message.verified === false && (
+                <motion.div
+                  initial={{ scale: 0, opacity: 0 }}
+                  animate={{ scale: 1, opacity: 1 }}
+                  className="absolute -bottom-2 -right-2 bg-white rounded-full p-0.5 shadow-md"
+                >
+                  <XCircle className="w-4 h-4 text-red-500 fill-red-100" />
+                </motion.div>
+              )}
             </div>
 
             {/* User Avatar */}
@@ -99,8 +123,11 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
               <p className="text-base leading-relaxed whitespace-pre-wrap break-words">
                 {transcript}
               </p>
-              <p className="text-xs mt-2 text-green-100 italic">
-                {isListening ? 'Listening...' : 'Processing...'}
+              <p className="text-xs mt-2 text-green-100 italic flex items-center gap-2">
+                {isListening ? 'Listening...' : verificationStatus === 'verifying' ? 'Verifying Voice...' : 'Processing...'}
+                {verificationStatus === 'verifying' && (
+                  <span className="w-2 h-2 bg-yellow-400 rounded-full animate-pulse" />
+                )}
               </p>
             </div>
             <div className="w-8 h-8 rounded-full bg-gradient-to-br from-green-400 to-blue-500 flex items-center justify-center flex-shrink-0 mt-1">
@@ -118,11 +145,10 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
           {/* Microphone Button */}
           <motion.button
             onClick={onToggleListening}
-            className={`w-14 h-14 rounded-full flex items-center justify-center shadow-lg transition-all flex-shrink-0 ${
-              isListening
-                ? 'bg-gradient-to-br from-red-500 to-red-600 hover:from-red-600 hover:to-red-700'
-                : 'bg-gradient-to-br from-green-500 to-blue-500 hover:from-green-600 hover:to-blue-600'
-            }`}
+            className={`w-14 h-14 rounded-full flex items-center justify-center shadow-lg transition-all flex-shrink-0 ${isListening
+              ? 'bg-gradient-to-br from-red-500 to-red-600 hover:from-red-600 hover:to-red-700'
+              : 'bg-gradient-to-br from-green-500 to-blue-500 hover:from-green-600 hover:to-blue-600'
+              }`}
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
             animate={isListening ? { scale: [1, 1.05, 1] } : {}}

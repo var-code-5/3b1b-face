@@ -10,6 +10,7 @@ export interface Message {
   text: string;
   isUser: boolean;
   timestamp: Date;
+  verified?: boolean;
 }
 
 export interface ChatSession {
@@ -28,6 +29,7 @@ const VoiceDashboard: React.FC = () => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [isListening, setIsListening] = useState(false);
   const [transcript, setTranscript] = useState('');
+  const [verificationStatus, setVerificationStatus] = useState<'idle' | 'verifying' | 'success' | 'failed'>('idle');
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const streamRef = useRef<MediaStream | null>(null);
   const audioChunksRef = useRef<Blob[]>([]);
@@ -57,14 +59,15 @@ const VoiceDashboard: React.FC = () => {
     }
   }, [chatSessions, user]);
 
-  const handleSpeechEnd = (finalText: string) => {
+  const handleSpeechEnd = (finalText: string, verified: boolean = false) => {
     if (!finalText) return;
 
     const newMessage: Message = {
       id: Date.now().toString(),
       text: finalText,
       isUser: true,
-      timestamp: new Date()
+      timestamp: new Date(),
+      verified
     };
 
     // If no current session, create one
@@ -76,9 +79,15 @@ const VoiceDashboard: React.FC = () => {
 
     // Simulate AI response
     setTimeout(() => {
+      let aiText = `I heard you say: "${finalText}". This is a placeholder response. In a real application, this would be processed by an AI backend.`;
+
+      if (!verified) {
+        aiText = "Voice Verification failed, CANNOT proceed.";
+      }
+
       const aiResponse: Message = {
         id: (Date.now() + 1).toString(),
-        text: `I heard you say: "${finalText}". This is a placeholder response. In a real application, this would be processed by an AI backend.`,
+        text: aiText,
         isUser: false,
         timestamp: new Date()
       };
@@ -120,11 +129,43 @@ const VoiceDashboard: React.FC = () => {
     }));
   };
 
+  const verifyVoice = async (audioBlob: Blob): Promise<boolean> => {
+    const token = localStorage.getItem('access_token');
+    if (!token) {
+      console.error("No access token found");
+      return false;
+    }
+
+    const formData = new FormData();
+    formData.append('file', audioBlob, 'voice_verify.webm');
+
+    try {
+      const response = await fetch('http://localhost:8000/verify_voice', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`
+        },
+        body: formData
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        return data.verified === true;
+      }
+      return false;
+    } catch (error) {
+      console.error("Verification error", error);
+      return false;
+    }
+  };
+
   const sendAudioToBackend = async () => {
     if (audioChunksRef.current.length === 0) {
       console.log('⚠️ No audio chunks to send');
       return;
     }
+
+    setVerificationStatus('verifying');
 
     try {
       // Create audio blob from chunks (keep as webm since that's what we record)
@@ -132,41 +173,50 @@ const VoiceDashboard: React.FC = () => {
 
       console.log('📤 Sending audio to backend...', audioBlob.size, 'bytes');
 
-      // Create FormData and append audio file
+      // Create FormData and append audio file for STT
       const formData = new FormData();
       formData.append('file', audioBlob, 'audio.webm');
 
-      // Send to backend
-      const res = await fetch('https://9lw52178ayis33-8000.proxy.runpod.net/stt', {
+      // Parallel execution: STT and Voice Verification
+      const sttPromise = fetch('https://dp6qmhnzu2b33f-8080.proxy.runpod.net/stt', {
         method: 'POST',
         body: formData
+      }).then(async (res) => {
+        if (!res.ok) {
+          const errorText = await res.text();
+          throw new Error(`STT HTTP error! status: ${res.status} - ${errorText}`);
+        }
+        return res.json();
       });
 
-      if (!res.ok) {
-        const errorText = await res.text();
-        console.error('Response error:', errorText);
-        throw new Error(`HTTP error! status: ${res.status}`);
-      }
+      const verificationPromise = verifyVoice(audioBlob);
 
-      const data = await res.json();
-      console.log('✅ Transcription received:', data);
+      const [sttData, isVerified] = await Promise.all([sttPromise, verificationPromise]);
 
-      // Update transcript and handle the result
-      if (data.text && data.text.trim()) {
-        setTranscript(data.text);
-        handleSpeechEnd(data.text.trim());
+      console.log('✅ Transcription received:', sttData);
+      console.log('🔐 Verification result:', isVerified);
+
+      setVerificationStatus(isVerified ? 'success' : 'failed');
+
+      // Update transcript and handle the result regardless of verification status
+      if (sttData.text && sttData.text.trim()) {
+        setTranscript(sttData.text);
+        handleSpeechEnd(sttData.text.trim(), isVerified);
       } else {
         console.log('⚠️ Empty transcript received');
         setTranscript('');
       }
 
     } catch (error) {
-      console.error('❌ Failed to send audio to backend:', error);
+      console.error('❌ Failed to process audio:', error);
       console.error('Full error:', error);
-      alert(`Failed to transcribe audio: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      alert(`Failed to process audio: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      setVerificationStatus('failed');
     } finally {
       // Clear audio chunks
       audioChunksRef.current = [];
+      // Reset status after a delay if needed, or keep it to show last status
+      setTimeout(() => setVerificationStatus('idle'), 3000);
     }
   };
 
@@ -289,6 +339,7 @@ const VoiceDashboard: React.FC = () => {
               isListening={isListening}
               transcript={transcript}
               onToggleListening={toggleListening}
+              verificationStatus={verificationStatus}
             />
           ) : (
             // Chat Interface State
@@ -298,6 +349,7 @@ const VoiceDashboard: React.FC = () => {
               isListening={isListening}
               transcript={transcript}
               onToggleListening={toggleListening}
+              verificationStatus={verificationStatus}
             />
           )}
         </AnimatePresence>

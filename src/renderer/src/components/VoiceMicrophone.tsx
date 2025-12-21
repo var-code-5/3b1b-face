@@ -6,12 +6,14 @@ interface VoiceMicrophoneProps {
   isListening: boolean;
   transcript: string;
   onToggleListening: () => void;
+  verificationStatus?: 'idle' | 'verifying' | 'success' | 'failed';
 }
 
 const VoiceMicrophone: React.FC<VoiceMicrophoneProps> = ({
   isListening,
   transcript,
-  onToggleListening
+  onToggleListening,
+  verificationStatus
 }) => {
   const [audioLevel, setAudioLevel] = useState(0);
 
@@ -102,11 +104,10 @@ const VoiceMicrophone: React.FC<VoiceMicrophoneProps> = ({
         {/* Microphone Button */}
         <motion.button
           onClick={onToggleListening}
-          className={`relative z-10 w-20 h-20 rounded-full flex items-center justify-center shadow-2xl transition-all ${
-            isListening
-              ? 'bg-gradient-to-br from-red-500 to-red-600 hover:from-red-600 hover:to-red-700'
-              : 'bg-gradient-to-br from-green-500 to-blue-500 hover:from-green-600 hover:to-blue-600'
-          }`}
+          className={`relative z-10 w-20 h-20 rounded-full flex items-center justify-center shadow-2xl transition-all ${isListening
+            ? 'bg-gradient-to-br from-red-500 to-red-600 hover:from-red-600 hover:to-red-700'
+            : 'bg-gradient-to-br from-green-500 to-blue-500 hover:from-green-600 hover:to-blue-600'
+            }`}
           whileHover={{ scale: 1.1 }}
           whileTap={{ scale: 0.95 }}
           animate={isListening ? { scale: [1, 1.05, 1] } : {}}
@@ -132,11 +133,16 @@ const VoiceMicrophone: React.FC<VoiceMicrophoneProps> = ({
               {transcript}
             </p>
           </div>
-          {isListening && (
-            <p className="text-center text-gray-400 text-sm mt-4">
-              Listening...
-            </p>
-          )}
+          <div className="flex items-center justify-center gap-2 mt-4">
+            {isListening ? (
+              <p className="text-center text-gray-400 text-sm">Listening...</p>
+            ) : verificationStatus === 'verifying' ? (
+              <>
+                <span className="w-2 h-2 bg-yellow-400 rounded-full animate-pulse" />
+                <p className="text-center text-yellow-400 text-sm">Verifying Voice...</p>
+              </>
+            ) : null}
+          </div>
         </motion.div>
       )}
 
