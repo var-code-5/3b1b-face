@@ -101,7 +101,7 @@ const Sidebar: React.FC<SidebarProps> = ({
       <div className="p-3">
         <Button
           onClick={onNewChat}
-          className="w-full bg-gradient-to-r from-green-500 to-blue-500 hover:from-green-600 hover:to-blue-600 text-white border-0 shadow-lg"
+          className="w-full bg-zinc-200 hover:bg-zinc-300 text-black border-0 shadow-lg"
           size={isCollapsed ? 'icon' : 'default'}
         >
           <MessageSquarePlus className="w-5 h-5" />

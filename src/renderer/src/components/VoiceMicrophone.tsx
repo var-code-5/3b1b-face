@@ -45,7 +45,7 @@ const VoiceMicrophone: React.FC<VoiceMicrophoneProps> = ({
           transition={{ delay: 0.2 }}
           className="text-center mb-12"
         >
-          <h1 className="text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-green-400 to-blue-500 mb-4">
+          <h1 className="text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-white via-zinc-100 to-zinc-300 mb-4">
             How can I help you today?
           </h1>
           <p className="text-gray-400 text-lg">
@@ -105,8 +105,8 @@ const VoiceMicrophone: React.FC<VoiceMicrophoneProps> = ({
         <motion.button
           onClick={onToggleListening}
           className={`relative z-10 w-20 h-20 rounded-full flex items-center justify-center shadow-2xl transition-all ${isListening
-            ? 'bg-gradient-to-br from-red-500 to-red-600 hover:from-red-600 hover:to-red-700'
-            : 'bg-gradient-to-br from-green-500 to-blue-500 hover:from-green-600 hover:to-blue-600'
+            ? 'bg-gradient-to-br from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white'
+            : 'bg-zinc-200 hover:bg-zinc-300 text-black'
             }`}
           whileHover={{ scale: 1.1 }}
           whileTap={{ scale: 0.95 }}
@@ -116,7 +116,7 @@ const VoiceMicrophone: React.FC<VoiceMicrophoneProps> = ({
           {isListening ? (
             <MicOff className="w-8 h-8 text-white" />
           ) : (
-            <Mic className="w-8 h-8 text-white" />
+            <Mic className="w-8 h-8" />
           )}
         </motion.button>
       </div>
@@ -128,7 +128,7 @@ const VoiceMicrophone: React.FC<VoiceMicrophoneProps> = ({
           animate={{ opacity: 1, y: 0 }}
           className="mt-12 max-w-2xl"
         >
-          <div className="bg-slate-800/50 backdrop-blur-md border border-slate-700/50 rounded-2xl p-6 shadow-xl">
+          <div className="bg-neutral-900/70 backdrop-blur-md border border-neutral-800/60 rounded-2xl p-6 shadow-xl">
             <p className="text-gray-300 text-lg text-center leading-relaxed">
               {transcript}
             </p>

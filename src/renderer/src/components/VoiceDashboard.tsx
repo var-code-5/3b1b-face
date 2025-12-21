@@ -316,7 +316,7 @@ const VoiceDashboard: React.FC = () => {
   const hasMessages = messages.length > 0;
 
   return (
-    <div className="flex h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-gray-100 overflow-hidden">
+    <div className="flex h-screen bg-[#191918] text-gray-100 overflow-hidden">
 
       {/* Sidebar */}
       <Sidebar
