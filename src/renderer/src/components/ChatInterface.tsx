@@ -146,8 +146,8 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
           <motion.button
             onClick={onToggleListening}
             className={`w-14 h-14 rounded-full flex items-center justify-center shadow-lg transition-all flex-shrink-0 ${isListening
-              ? 'bg-gradient-to-br from-red-500 to-red-600 hover:from-red-600 hover:to-red-700'
-              : 'bg-gradient-to-br from-green-500 to-blue-500 hover:from-green-600 hover:to-blue-600'
+              ? 'bg-gradient-to-br from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white'
+              : 'bg-zinc-200 hover:bg-zinc-300 text-black'
               }`}
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
@@ -157,7 +157,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
             {isListening ? (
               <MicOff className="w-6 h-6 text-white" />
             ) : (
-              <Mic className="w-6 h-6 text-white" />
+              <Mic className="w-6 h-6" />
             )}
           </motion.button>
 

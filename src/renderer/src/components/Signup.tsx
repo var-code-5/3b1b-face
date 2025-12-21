@@ -16,6 +16,9 @@ import {
 import { ArrowLeft, CheckCircle2, Mic } from 'lucide-react'
 import VoiceRecorder from './VoiceRecorder';
 
+// Paragraph for voice verification
+const VOICE_VERIFICATION_TEXT = "The quick brown fox jumps over the lazy dog. Banking security requires voice authentication for all transactions. I authorize this voice sample to be used for verification purposes.";
+
 const Signup: React.FC = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -137,6 +140,14 @@ const Signup: React.FC = () => {
                   <div className="bg-muted/50 p-4 rounded-lg text-sm text-muted-foreground text-center">
                     <Mic className="w-8 h-8 mx-auto mb-2 text-primary" />
                     <p>We use voice biometrics to secure your account. Please record a short sample of your voice.</p>
+                  </div>
+
+                  {/* Paragraph to read */}
+                  <div className="bg-primary/10 border border-primary/20 p-6 rounded-lg">
+                    <h3 className="text-sm font-semibold mb-3 text-primary">Please read this text aloud:</h3>
+                    <p className="text-base leading-relaxed text-black font-medium">
+                      "{VOICE_VERIFICATION_TEXT}"
+                    </p>
                   </div>
 
                   <VoiceRecorder onRecordingComplete={handleVoiceRecorded} />
