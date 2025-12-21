@@ -13,7 +13,7 @@ import {
 } from 'lucide-react';
 
 interface SidebarProps {
-  user: string | null;
+  user: any | null;
   logout: () => void;
   chatSessions: ChatSession[];
   currentSessionId: string | null;
@@ -87,7 +87,9 @@ const Sidebar: React.FC<SidebarProps> = ({
                 exit={{ opacity: 0, width: 0 }}
                 className="overflow-hidden"
               >
-                <p className="text-sm font-medium text-gray-200 truncate">{user}</p>
+                <p className="text-sm font-medium text-gray-200 truncate">
+                  {typeof user === 'object' && user !== null ? (user as any).email : user}
+                </p>
                 <p className="text-xs text-gray-400">Online</p>
               </motion.div>
             )}
@@ -131,11 +133,10 @@ const Sidebar: React.FC<SidebarProps> = ({
                       >
                         <button
                           onClick={() => onSelectSession(session.id)}
-                          className={`w-full text-left px-3 py-2.5 rounded-lg transition-all flex items-center gap-2 ${
-                            currentSessionId === session.id
-                              ? 'bg-slate-700/70 text-white'
-                              : 'text-gray-300 hover:bg-slate-700/50'
-                          }`}
+                          className={`w-full text-left px-3 py-2.5 rounded-lg transition-all flex items-center gap-2 ${currentSessionId === session.id
+                            ? 'bg-slate-700/70 text-white'
+                            : 'text-gray-300 hover:bg-slate-700/50'
+                            }`}
                         >
                           <MessageSquare className="w-4 h-4 flex-shrink-0" />
                           <span className="text-sm truncate flex-1">
@@ -170,11 +171,10 @@ const Sidebar: React.FC<SidebarProps> = ({
               <button
                 key={session.id}
                 onClick={() => onSelectSession(session.id)}
-                className={`w-full p-2 rounded-lg transition-all ${
-                  currentSessionId === session.id
-                    ? 'bg-slate-700/70'
-                    : 'hover:bg-slate-700/50'
-                }`}
+                className={`w-full p-2 rounded-lg transition-all ${currentSessionId === session.id
+                  ? 'bg-slate-700/70'
+                  : 'hover:bg-slate-700/50'
+                  }`}
               >
                 <MessageSquare className="w-5 h-5 text-gray-300 mx-auto" />
               </button>

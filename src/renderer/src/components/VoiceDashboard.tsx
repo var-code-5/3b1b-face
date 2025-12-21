@@ -22,6 +22,7 @@ export interface ChatSession {
 
 const VoiceDashboard: React.FC = () => {
   const { user, logout } = useAuth();
+  const userKey = typeof user === 'object' && user !== null ? (user as any).email : user;
   const [chatSessions, setChatSessions] = useState<ChatSession[]>([]);
   const [currentSessionId, setCurrentSessionId] = useState<string | null>(null);
   const [messages, setMessages] = useState<Message[]>([]);
@@ -33,7 +34,7 @@ const VoiceDashboard: React.FC = () => {
 
   // Load chat sessions from localStorage
   useEffect(() => {
-    const savedSessions = localStorage.getItem(`chatSessions_${user}`);
+    const savedSessions = localStorage.getItem(`chatSessions_${userKey}`);
     if (savedSessions) {
       const parsed = JSON.parse(savedSessions);
       const sessionsWithDates = parsed.map((session: any) => ({
@@ -52,7 +53,7 @@ const VoiceDashboard: React.FC = () => {
   // Save chat sessions to localStorage
   useEffect(() => {
     if (chatSessions.length > 0) {
-      localStorage.setItem(`chatSessions_${user}`, JSON.stringify(chatSessions));
+      localStorage.setItem(`chatSessions_${userKey}`, JSON.stringify(chatSessions));
     }
   }, [chatSessions, user]);
 
@@ -128,7 +129,7 @@ const VoiceDashboard: React.FC = () => {
     try {
       // Create audio blob from chunks (keep as webm since that's what we record)
       const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/webm' });
-      
+
       console.log('📤 Sending audio to backend...', audioBlob.size, 'bytes');
 
       // Create FormData and append audio file
@@ -173,10 +174,10 @@ const VoiceDashboard: React.FC = () => {
     if (!isListening) {
       setTranscript('');
       audioChunksRef.current = []; // Reset audio chunks
-      
+
       try {
         console.log('🎤 Starting audio recording...');
-        
+
         // Request microphone access
         const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
         streamRef.current = stream;
@@ -205,7 +206,7 @@ const VoiceDashboard: React.FC = () => {
         mediaRecorderRef.current = mediaRecorder;
         mediaRecorder.start(250); // Collect audio chunks every 250ms
         setIsListening(true);
-        
+
       } catch (error) {
         console.error('❌ Failed to start audio recording:', error);
         alert('Failed to access microphone. Please check your microphone permissions.');
@@ -219,12 +220,12 @@ const VoiceDashboard: React.FC = () => {
       try {
         console.log('🛑 Stopping audio recording...');
         mediaRecorderRef.current.stop();
-        
+
         // Stop all tracks
         if (streamRef.current) {
           streamRef.current.getTracks().forEach(track => track.stop());
         }
-        
+
         setIsListening(false);
         // Note: Audio will be sent to backend in the onstop event handler
       } catch (error) {
@@ -266,7 +267,7 @@ const VoiceDashboard: React.FC = () => {
 
   return (
     <div className="flex h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-gray-100 overflow-hidden">
-      
+
       {/* Sidebar */}
       <Sidebar
         user={user}
