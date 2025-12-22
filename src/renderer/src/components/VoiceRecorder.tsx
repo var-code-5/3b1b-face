@@ -1,6 +1,7 @@
 import React, { useState, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { Mic, Square, Play, RefreshCw } from 'lucide-react';
+import { convertWebMToWav } from '../utils/audioConverter';
 
 interface VoiceRecorderProps {
     onRecordingComplete: (blob: Blob) => void;
@@ -32,11 +33,17 @@ const VoiceRecorder: React.FC<VoiceRecorderProps> = ({ onRecordingComplete }) =>
                 }
             };
 
-            mediaRecorderRef.current.onstop = () => {
-                const blob = new Blob(chunksRef.current, { type: 'audio/webm' });
-                console.log("Recording stopped. Blob size:", blob.size);
-                setAudioBlob(blob);
-                onRecordingComplete(blob);
+            mediaRecorderRef.current.onstop = async () => {
+                const webmBlob = new Blob(chunksRef.current, { type: 'audio/webm' });
+                console.log("Recording stopped. WebM Blob size:", webmBlob.size);
+                
+                // Convert WebM to WAV
+                console.log("Converting WebM to WAV...");
+                const wavBlob = await convertWebMToWav(webmBlob);
+                console.log("Conversion complete. WAV Blob size:", wavBlob.size);
+                
+                setAudioBlob(wavBlob);
+                onRecordingComplete(wavBlob);
                 stream.getTracks().forEach(track => track.stop());
             };
 
