@@ -2,6 +2,7 @@ import React, { useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { Message } from './VoiceDashboard';
 import { Mic, MicOff, User, Bot, CheckCircle, XCircle } from 'lucide-react';
+import FormattedMessage from './FormattedMessage';
 
 interface ChatInterfaceProps {
   messages: Message[];
@@ -69,9 +70,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
                   : 'bg-slate-800/50 backdrop-blur-md border border-slate-700/50 text-gray-200'
                   } rounded-2xl px-5 py-3 shadow-lg`}
               >
-                <p className="text-base leading-relaxed whitespace-pre-wrap break-words">
-                  {message.text}
-                </p>
+                <FormattedMessage text={message.text} isUser={message.isUser} />
                 <p
                   className={`text-xs mt-2 ${message.isUser ? 'text-green-100' : 'text-gray-400'
                     }`}
