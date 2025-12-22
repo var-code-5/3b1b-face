@@ -7,7 +7,13 @@ interface ProtectedRouteProps {
 }
 
 const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
-  const { user } = useAuth();
+  const { user, isInitialized } = useAuth();
+  
+  // Wait for auth initialization before making redirect decision
+  if (!isInitialized) {
+    return null; // or a loading spinner
+  }
+  
   return user ? <>{children}</> : <Navigate to="/login" />;
 };
 
