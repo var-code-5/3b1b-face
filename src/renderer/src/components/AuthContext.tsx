@@ -78,7 +78,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       const formData = new FormData();
       formData.append('email', email);
       formData.append('password', password);
-      formData.append('file', file, 'voice_sample.webm');
+      formData.append('file', file, 'voice_sample.wav');
 
       const response = await fetch('http://localhost:8000/signup', {
         method: 'POST',
