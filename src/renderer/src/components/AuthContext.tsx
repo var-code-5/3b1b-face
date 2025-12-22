@@ -7,6 +7,7 @@ interface AuthContextType {
   loginWithGoogle: () => Promise<boolean>;
   logout: () => void;
   isLoading: boolean;
+  isInitialized: boolean;
   error: string | null;
 }
 
@@ -27,6 +28,7 @@ interface AuthProviderProps {
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [user, setUser] = useState<any | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [isInitialized, setIsInitialized] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
@@ -39,6 +41,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         console.error("Failed to parse user from local storage", e);
       }
     }
+    setIsInitialized(true);
   }, []);
 
   const login = async (email: string, password: string): Promise<boolean> => {
@@ -174,7 +177,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ user, login, signup, loginWithGoogle, logout, isLoading, error }}>
+    <AuthContext.Provider value={{ user, login, signup, loginWithGoogle, logout, isLoading, isInitialized, error }}>
       {children}
     </AuthContext.Provider>
   );
