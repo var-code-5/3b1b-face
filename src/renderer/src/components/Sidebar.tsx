@@ -62,12 +62,12 @@ const Sidebar: React.FC<SidebarProps> = ({
       initial={{ width: 280 }}
       animate={{ width: isCollapsed ? 60 : 280 }}
       transition={{ duration: 0.3, ease: 'easeInOut' }}
-      className="bg-slate-800/50 backdrop-blur-md border-r border-slate-700/50 flex flex-col relative"
+      className="bg-[#191918] backdrop-blur-md border-r border-slate-700/50 flex flex-col relative"
     >
       {/* Toggle Button */}
       <button
         onClick={() => setIsCollapsed(!isCollapsed)}
-        className="absolute -right-3 top-6 z-10 bg-slate-700 hover:bg-slate-600 rounded-full p-1.5 border border-slate-600 transition-colors"
+        className="absolute -right-3 top-6 z-10 bg-black hover:bg-slate-950 rounded-full p-1.5 border border-slate-600 transition-colors"
       >
         {isCollapsed ? (
           <ChevronRight className="w-4 h-4 text-gray-300" />
@@ -79,7 +79,7 @@ const Sidebar: React.FC<SidebarProps> = ({
       {/* User Profile */}
       <div className="p-4 border-b border-slate-700/50">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-full bg-gradient-to-br from-green-400 to-blue-500 flex items-center justify-center flex-shrink-0">
+          <div className="w-10 h-10 rounded-full bg-gradient-to-br from-slate-50 to-slate-600 flex items-center justify-center flex-shrink-0">
             <User className="w-5 h-5 text-white" />
           </div>
           <AnimatePresence>

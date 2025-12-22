@@ -45,7 +45,7 @@ const VoiceMicrophone: React.FC<VoiceMicrophoneProps> = ({
           transition={{ delay: 0.2 }}
           className="text-center mb-12"
         >
-          <h1 className="text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-white via-zinc-100 to-zinc-300 mb-4">
+          <h1 className="text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-[#191918] via-[#a19b8b] to-[#191918] mb-4">
             How can I help you today?
           </h1>
           <p className="text-gray-400 text-lg">

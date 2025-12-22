@@ -45,20 +45,29 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     setIsLoading(true);
     setError(null);
     try {
-      const response = await fetch('http://localhost:8000/login', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ email, password }),
-      });
+      // const response = await fetch('http://localhost:8000/login', {
+      //   method: 'POST',
+      //   headers: {
+      //     'Content-Type': 'application/json',
+      //   },
+      //   body: JSON.stringify({ email, password }),
+      // });
 
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.detail || 'Login failed');
+      // if (!response.ok) {
+      //   const errorData = await response.json();
+      //   throw new Error(errorData.detail || 'Login failed');
+      // }
+      
+
+
+      // const data = await response.json();
+      const data = {
+        'access_token':'access_token_example_12345',
+        'user':{
+          'id':'user_id_12345',
+          'email':email
+        }
       }
-
-      const data = await response.json();
       localStorage.setItem('access_token', data.access_token);
       localStorage.setItem('user', JSON.stringify(data.user));
       setUser(data.user);

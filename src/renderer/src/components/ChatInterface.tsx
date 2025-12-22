@@ -45,7 +45,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
       {/* Messages Container */}
       <div
         ref={messagesContainerRef}
-        className="flex-1 overflow-y-auto px-4 py-6 space-y-6"
+        className="flex-1 overflow-y-auto px-4 py-6 space-y-6 pt-20"
       >
         {messages.map((message, index) => (
           <motion.div
@@ -57,7 +57,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
           >
             {/* AI Avatar */}
             {!message.isUser && (
-              <div className="w-8 h-8 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center flex-shrink-0 mt-1">
+              <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[#f2bc72] to-[#e1a13d] flex items-center justify-center flex-shrink-0 mt-1">
                 <Bot className="w-5 h-5 text-white" />
               </div>
             )}
@@ -66,8 +66,8 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
             <div className="relative">
               <div
                 className={`max-w-2xl ${message.isUser
-                  ? 'bg-gradient-to-br from-green-500 to-blue-500 text-white'
-                  : 'bg-slate-800/50 backdrop-blur-md border border-slate-700/50 text-gray-200'
+                  ? 'bg-gradient-to-br from-[#191918] to-black text-white'
+                  : 'bg-[#191918] backdrop-blur-md border border-slate-700/50 text-gray-200'
                   } rounded-2xl px-5 py-3 shadow-lg`}
               >
                 <FormattedMessage text={message.text} isUser={message.isUser} />
@@ -104,7 +104,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
 
             {/* User Avatar */}
             {message.isUser && (
-              <div className="w-8 h-8 rounded-full bg-gradient-to-br from-green-400 to-blue-500 flex items-center justify-center flex-shrink-0 mt-1">
+              <div className="w-8 h-8 rounded-full bg-gradient-to-br from-slate-50 to-slate-600 flex items-center justify-center flex-shrink-0 mt-1">
                 <User className="w-5 h-5 text-white" />
               </div>
             )}
@@ -118,7 +118,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
             animate={{ opacity: 1, y: 0 }}
             className="flex justify-end gap-3"
           >
-            <div className="max-w-2xl bg-gradient-to-br from-green-500/50 to-blue-500/50 border-2 border-green-400 text-white rounded-2xl px-5 py-3 shadow-lg">
+            <div className="max-w-2xl bg-gradient-to-br from-[#191918] to-black border-2 border-[#191918] text-white rounded-2xl px-5 py-3 shadow-lg">
               <p className="text-base leading-relaxed whitespace-pre-wrap break-words">
                 {transcript}
               </p>
@@ -129,7 +129,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
                 )}
               </p>
             </div>
-            <div className="w-8 h-8 rounded-full bg-gradient-to-br from-green-400 to-blue-500 flex items-center justify-center flex-shrink-0 mt-1">
+            <div className="w-8 h-8 rounded-full bg-gradient-to-br from-slate-50 to-slate-600 flex items-center justify-center flex-shrink-0 mt-1">
               <User className="w-5 h-5 text-white" />
             </div>
           </motion.div>
@@ -139,7 +139,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
       </div>
 
       {/* Bottom Input Area with Microphone */}
-      <div className="border-t border-slate-700/50 bg-slate-800/30 backdrop-blur-md p-4">
+      <div className="border-t border-slate-700/50 bg-[#191918]/80 max-w-1/3 w-full mx-auto -translate-y-10 backdrop-blur-md p-4 rounded-full">
         <div className="max-w-4xl mx-auto flex items-center gap-4">
           {/* Microphone Button */}
           <motion.button
