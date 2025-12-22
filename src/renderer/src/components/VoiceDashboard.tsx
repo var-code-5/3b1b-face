@@ -4,6 +4,7 @@ import { useAuth } from './AuthContext';
 import Sidebar from './Sidebar';
 import VoiceMicrophone from './VoiceMicrophone';
 import ChatInterface from './ChatInterface';
+import { convertWebMToWav } from '../utils/audioConverter';
 
 export interface Message {
   id: string;
@@ -137,7 +138,7 @@ const VoiceDashboard: React.FC = () => {
     }
 
     const formData = new FormData();
-    formData.append('file', audioBlob, 'voice_verify.webm');
+    formData.append('file', audioBlob, 'voice_verify.wav');
 
     try {
       const response = await fetch('http://localhost:8000/verify_voice', {
@@ -168,14 +169,18 @@ const VoiceDashboard: React.FC = () => {
     setVerificationStatus('verifying');
 
     try {
-      // Create audio blob from chunks (keep as webm since that's what we record)
-      const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/webm' });
+      // Create audio blob from chunks (WebM format from recording)
+      const webmBlob = new Blob(audioChunksRef.current, { type: 'audio/webm' });
+      
+      console.log('🔄 Converting WebM to WAV...');
+      // Convert WebM to WAV for backend compatibility
+      const audioBlob = await convertWebMToWav(webmBlob);
 
       console.log('📤 Sending audio to backend...', audioBlob.size, 'bytes');
 
       // Create FormData and append audio file for STT
       const formData = new FormData();
-      formData.append('file', audioBlob, 'audio.webm');
+      formData.append('file', audioBlob, 'audio.wav');
 
       // Parallel execution: STT and Voice Verification
       const sttPromise = fetch('https://dp6qmhnzu2b33f-8080.proxy.runpod.net/stt', {
