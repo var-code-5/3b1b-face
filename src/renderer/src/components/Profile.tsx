@@ -177,7 +177,7 @@ const Profile: React.FC = () => {
     };
 
     return (
-        <div className="flex h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-gray-100 overflow-hidden">
+        <div className="flex h-screen bg-[#EFE9E3]  text-gray-100 overflow-hidden">
             <Sidebar
                 user={user}
                 logout={logout}
@@ -191,21 +191,21 @@ const Profile: React.FC = () => {
             <div className="flex-1 overflow-y-auto p-8">
                 <div className="max-w-4xl mx-auto space-y-8">
                     <div className="flex justify-between items-center">
-                        <h1 className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-green-400 to-blue-500">
+                        <h1 className="text-3xl font-bold bg-clip-text text-[#242422]">
                             Vault Management
                         </h1>
                         <div className="flex gap-2">
                             <Button variant="destructive" onClick={lockVault} className="gap-2">
                                 <Lock className="w-4 h-4" /> Lock Vault
                             </Button>
-                            <Button variant="outline" onClick={purgeExpired} className="gap-2 text-slate-200 border-slate-700 hover:bg-slate-800">
+                            <Button variant="outline" onClick={purgeExpired} className="bg-[#191918] gap-2 text-slate-200 border-slate-700 hover:bg-slate-800">
                                 <Trash2 className="w-4 h-4" /> Purge Expired
                             </Button>
                         </div>
                     </div>
 
                     {/* Initialize Vault Section */}
-                    <Card className="bg-slate-800/50 border-slate-700 backdrop-blur-sm">
+                    <Card className="bg-[#191918]/90 border-slate-700 backdrop-blur-sm">
                         <CardHeader>
                             <CardTitle className="text-slate-100">Initialize Vault</CardTitle>
                             <CardDescription className="text-slate-400">Set a master password to initialize or unlock the vault.</CardDescription>
@@ -216,9 +216,9 @@ const Profile: React.FC = () => {
                                 placeholder="Master Password"
                                 value={initPassword}
                                 onChange={(e) => setInitPassword(e.target.value)}
-                                className="bg-slate-900/50 border-slate-600 text-slate-100 placeholder:text-slate-500"
+                                className="bg-[#191918]/90 border-slate-600 text-slate-100 placeholder:text-slate-500"
                             />
-                            <Button onClick={initializeVault} className="bg-gradient-to-r from-green-500 to-blue-500 hover:from-green-600 hover:to-blue-600 border-0">
+                            <Button onClick={initializeVault} className=" bg-[#a19b8b] border-0">
                                 Initialize
                             </Button>
                         </CardContent>
@@ -226,7 +226,7 @@ const Profile: React.FC = () => {
 
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                         {/* Services List */}
-                        <Card className="md:col-span-1 bg-slate-800/50 border-slate-700 backdrop-blur-sm h-[600px] flex flex-col">
+                        <Card className="md:col-span-1 bg-[#191918]/90 border-slate-700 backdrop-blur-sm h-[600px] flex flex-col">
                             <CardHeader>
                                 <CardTitle className="text-slate-100">Services</CardTitle>
                             </CardHeader>
@@ -234,7 +234,7 @@ const Profile: React.FC = () => {
                                 {services.map(service => (
                                     <div
                                         key={service}
-                                        className={`p-3 rounded-lg cursor-pointer transition-colors flex justify-between items-center group ${selectedService === service ? 'bg-slate-700/70 text-white' : 'hover:bg-slate-700/50 text-slate-300'
+                                        className={`p-3 rounded-lg cursor-pointer transition-colors flex justify-between items-center group ${selectedService === service ? 'bg-slate-700/70 text-white' : 'hover:bg-[#191918]/90 text-slate-300'
                                             }`}
                                         onClick={() => fetchServiceData(service)}
                                     >
@@ -258,7 +258,7 @@ const Profile: React.FC = () => {
                         {/* Credential Details / Add New */}
                         <div className="md:col-span-2 space-y-6">
                             {/* Add New Credential */}
-                            <Card className="bg-slate-800/50 border-slate-700 backdrop-blur-sm">
+                            <Card className="bg-[#191918]/90 border-slate-700 backdrop-blur-sm">
                                 <CardHeader>
                                     <CardTitle className="text-slate-100 text-lg">Add New Credential</CardTitle>
                                 </CardHeader>
@@ -266,7 +266,7 @@ const Profile: React.FC = () => {
                                     <div className="space-y-2">
                                         <Label className="text-slate-300">Credential Data (JSON)</Label>
                                         <textarea
-                                            className="w-full h-32 bg-slate-900/50 border border-slate-600 rounded-md p-3 text-slate-100 font-mono text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                            className="w-full h-32 bg-[#191918]/90 border border-slate-600 rounded-md p-3 text-slate-100 font-mono text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                                             value={newServiceJson}
                                             onChange={(e) => setNewServiceJson(e.target.value)}
                                             placeholder='{ "service": "google", "username": "...", "password": "..." }'
@@ -281,7 +281,7 @@ const Profile: React.FC = () => {
 
                             {/* View/Edit Credential */}
                             {selectedService && serviceData && (
-                                <Card className="bg-slate-800/50 border-slate-700 backdrop-blur-sm">
+                                <Card className="bg-[#191918]/90 border-slate-700 backdrop-blur-sm">
                                     <CardHeader className="flex flex-row items-center justify-between">
                                         <CardTitle className="text-slate-100">
                                             {selectedService}
@@ -299,7 +299,7 @@ const Profile: React.FC = () => {
                                         {isEditing ? (
                                             <div className="space-y-4">
                                                 <textarea
-                                                    className="w-full h-64 bg-slate-900/50 border border-slate-600 rounded-md p-3 text-slate-100 font-mono text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                                    className="w-full h-64 bg-[#191918]/90 border border-slate-600 rounded-md p-3 text-slate-100 font-mono text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                                                     value={newData}
                                                     onChange={(e) => setNewData(e.target.value)}
                                                 />
@@ -308,7 +308,7 @@ const Profile: React.FC = () => {
                                                 </Button>
                                             </div>
                                         ) : (
-                                            <pre className="bg-slate-900/50 p-4 rounded-lg overflow-x-auto text-sm font-mono text-slate-300">
+                                            <pre className="bg-[#191918]/90 p-4 rounded-lg overflow-x-auto text-sm font-mono text-slate-300">
                                                 {JSON.stringify(serviceData, null, 2)}
                                             </pre>
                                         )}
