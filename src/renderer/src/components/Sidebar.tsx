@@ -12,6 +12,8 @@ import {
   ChevronRight
 } from 'lucide-react';
 
+import { useNavigate } from 'react-router-dom';
+
 interface SidebarProps {
   user: any | null;
   logout: () => void;
@@ -31,6 +33,7 @@ const Sidebar: React.FC<SidebarProps> = ({
   onNewChat,
   onDeleteSession
 }) => {
+  const navigate = useNavigate();
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [hoveredSessionId, setHoveredSessionId] = useState<string | null>(null);
 
@@ -183,8 +186,18 @@ const Sidebar: React.FC<SidebarProps> = ({
         )}
       </div>
 
-      {/* Logout Button */}
-      <div className="p-3 border-t border-slate-700/50">
+      {/* Settings Button */}
+      <div className="p-3 border-t border-slate-700/50 mt-auto">
+        <Button
+          onClick={() => navigate('/profile')}
+          variant="ghost"
+          className="w-full text-gray-300 hover:text-white hover:bg-slate-700/50 mb-2"
+          size={isCollapsed ? 'icon' : 'default'}
+        >
+          <User className="w-5 h-5" />
+          {!isCollapsed && <span className="ml-2">Profile & Vault</span>}
+        </Button>
+
         <Button
           onClick={logout}
           variant="ghost"

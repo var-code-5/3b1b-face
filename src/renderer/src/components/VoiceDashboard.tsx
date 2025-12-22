@@ -26,6 +26,13 @@ const VoiceDashboard: React.FC = () => {
   const userKey = typeof user === 'object' && user !== null ? (user as any).email : user;
   const [chatSessions, setChatSessions] = useState<ChatSession[]>([]);
   const [currentSessionId, setCurrentSessionId] = useState<string | null>(null);
+  const currentSessionIdRef = useRef<string | null>(null);
+
+  // Keep ref in sync with state
+  useEffect(() => {
+    currentSessionIdRef.current = currentSessionId;
+  }, [currentSessionId]);
+
   const [messages, setMessages] = useState<Message[]>([]);
   const [isListening, setIsListening] = useState(false);
   const [transcript, setTranscript] = useState('');
@@ -57,9 +64,64 @@ const VoiceDashboard: React.FC = () => {
     if (chatSessions.length > 0) {
       localStorage.setItem(`chatSessions_${userKey}`, JSON.stringify(chatSessions));
     }
-  }, [chatSessions, user]);
+  }, [chatSessions, userKey]);
 
-  const handleSpeechEnd = (finalText: string, verified: boolean = false) => {
+  // Load current session ID
+  useEffect(() => {
+    const savedSessionId = localStorage.getItem(`currentSessionId_${userKey}`);
+    if (savedSessionId) {
+      setCurrentSessionId(savedSessionId);
+    }
+  }, [userKey]);
+
+  // Save current session ID
+  useEffect(() => {
+    if (currentSessionId) {
+      localStorage.setItem(`currentSessionId_${userKey}`, currentSessionId);
+    } else {
+      localStorage.removeItem(`currentSessionId_${userKey}`);
+    }
+  }, [currentSessionId, userKey]);
+
+  const updateMessage = (id: string, text: string, sessionId: string) => {
+    if (sessionId === currentSessionIdRef.current) {
+      setMessages(prev => prev.map(msg =>
+        msg.id === id ? { ...msg, text } : msg
+      ));
+    }
+
+    setChatSessions(prev => prev.map(session => {
+      if (session.id === sessionId) {
+        const updatedMessages = session.messages.map(msg =>
+          msg.id === id ? { ...msg, text } : msg
+        );
+        return {
+          ...session,
+          messages: updatedMessages,
+          updatedAt: new Date()
+        };
+      }
+      return session;
+    }));
+  };
+
+  const createNewSession = (initialMessages: Message[] = []) => {
+    const newSessionId = Date.now().toString();
+    const newSession: ChatSession = {
+      id: newSessionId,
+      title: initialMessages[0]?.text.substring(0, 30) + '...' || 'New Chat',
+      messages: initialMessages,
+      createdAt: new Date(),
+      updatedAt: new Date()
+    };
+
+    setChatSessions(prev => [newSession, ...prev]);
+    setCurrentSessionId(newSessionId);
+    setMessages(initialMessages);
+    return newSessionId;
+  };
+
+  const handleSpeechEnd = async (finalText: string, verified: boolean = false) => {
     if (!finalText) return;
 
     const newMessage: Message = {
@@ -70,53 +132,114 @@ const VoiceDashboard: React.FC = () => {
       verified
     };
 
+    let activeSessionId = currentSessionIdRef.current;
+
     // If no current session, create one
-    if (!currentSessionId) {
-      createNewSession([newMessage]);
+    if (!activeSessionId) {
+      console.log('Creating new session for message:', newMessage);
+      activeSessionId = createNewSession([newMessage]);
     } else {
-      addMessageToCurrentSession(newMessage);
+      console.log('Adding message to existing session:', activeSessionId);
+      addMessageToCurrentSession(newMessage, activeSessionId);
     }
 
-    // Simulate AI response
-    setTimeout(() => {
-      let aiText = `I heard you say: "${finalText}". This is a placeholder response. In a real application, this would be processed by an AI backend.`;
-
-      if (!verified) {
-        aiText = "Voice Verification failed, CANNOT proceed.";
-      }
-
-      const aiResponse: Message = {
+    if (!verified) {
+      const errorMsg: Message = {
         id: (Date.now() + 1).toString(),
-        text: aiText,
+        text: "Voice Verification failed, but proceeding...",
         isUser: false,
         timestamp: new Date()
       };
-      addMessageToCurrentSession(aiResponse);
-    }, 1000);
 
-    // Clear transcript after finalizing
-    setTranscript('');
-  };
+      setTimeout(() => {
+        addMessageToCurrentSession(errorMsg, activeSessionId!);
+      }, 100);
+      // return; // Proceeding to LLM even if verification fails
+    }
 
-  const createNewSession = (initialMessages: Message[] = []) => {
-    const newSession: ChatSession = {
-      id: Date.now().toString(),
-      title: initialMessages[0]?.text.substring(0, 30) + '...' || 'New Chat',
-      messages: initialMessages,
-      createdAt: new Date(),
-      updatedAt: new Date()
+    // Create placeholder AI message
+    const aiMessageId = (Date.now() + 2).toString();
+    const aiPlaceholder: Message = {
+      id: aiMessageId,
+      text: "...",
+      isUser: false,
+      timestamp: new Date()
     };
 
-    setChatSessions(prev => [newSession, ...prev]);
-    setCurrentSessionId(newSession.id);
-    setMessages(initialMessages);
+    setTimeout(() => {
+      addMessageToCurrentSession(aiPlaceholder, activeSessionId!);
+      console.log(`🤖 Calling streamLlmResponse with prompt: "${finalText}"`);
+      streamLlmResponse(finalText, aiMessageId, activeSessionId!);
+    }, 200); // Slight delay to appear after error message if any
   };
 
-  const addMessageToCurrentSession = (message: Message) => {
-    setMessages(prev => [...prev, message]);
+  const streamLlmResponse = async (prompt: string, messageId: string, sessionId: string) => {
+    console.log(`🌊 streamLlmResponse started for messageId: ${messageId}, sessionId: ${sessionId}`);
+    try {
+      const response = await fetch('http://localhost:8080/llm/get-action', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ intent: prompt }),
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      if (!response.body) {
+        throw new Error('No response body');
+      }
+
+      const reader = response.body.getReader();
+      const decoder = new TextDecoder();
+      let aiText = '';
+
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+
+        const chunk = decoder.decode(value, { stream: true });
+        const lines = chunk.split('\n');
+        for (const line of lines) {
+          if (line.trim() === '') continue;
+          if (line.startsWith('data: ')) {
+            const data = line.slice(6);
+            if (data === '[DONE]') continue; // OpenAI style
+            try {
+              const json = JSON.parse(data);
+              if (json.text) aiText += json.text;
+              else if (json.delta) aiText += json.delta;
+              else if (json.content) aiText += json.content;
+              else aiText += data; // Fallback
+            } catch (e) {
+              aiText += data;
+            }
+          } else {
+            if (!line.startsWith('id:') && !line.startsWith('event:') && !line.startsWith('retry:')) {
+              aiText += line;
+            }
+          }
+        }
+
+        updateMessage(messageId, aiText, sessionId);
+      }
+
+    } catch (error) {
+      console.error("LLM Error:", error);
+      alert(`LLM Error: ${error instanceof Error ? error.message : String(error)}`);
+      updateMessage(messageId, "Error fetching response from AI agent.", sessionId);
+    }
+  };
+
+  const addMessageToCurrentSession = (message: Message, sessionId: string) => {
+    if (sessionId === currentSessionIdRef.current) {
+      setMessages(prev => [...prev, message]);
+    }
 
     setChatSessions(prev => prev.map(session => {
-      if (session.id === currentSessionId) {
+      if (session.id === sessionId) {
         const updatedMessages = [...session.messages, message];
         return {
           ...session,
@@ -199,11 +322,13 @@ const VoiceDashboard: React.FC = () => {
       setVerificationStatus(isVerified ? 'success' : 'failed');
 
       // Update transcript and handle the result regardless of verification status
+      console.log('Processing STT data:', sttData);
       if (sttData.text && sttData.text.trim()) {
+        console.log('Text found, handling speech end:', sttData.text);
         setTranscript(sttData.text);
         handleSpeechEnd(sttData.text.trim(), isVerified);
       } else {
-        console.log('⚠️ Empty transcript received');
+        console.log('⚠️ Empty transcript received or text field missing in:', sttData);
         setTranscript('');
       }
 

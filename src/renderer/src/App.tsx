@@ -4,6 +4,7 @@ import Landing from './components/Landing';
 import Login from './components/Login';
 import Signup from './components/Signup';
 import Dashboard from './components/Dashboard';
+import Profile from './components/Profile';
 import ProtectedRoute from './components/ProtectedRoute';
 
 function App(): React.JSX.Element {
@@ -19,6 +20,14 @@ function App(): React.JSX.Element {
             element={
               <ProtectedRoute>
                 <Dashboard />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/profile"
+            element={
+              <ProtectedRoute>
+                <Profile />
               </ProtectedRoute>
             }
           />
